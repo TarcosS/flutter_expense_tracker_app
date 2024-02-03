@@ -66,7 +66,7 @@ The Expenses Tracker App is developed to simplify personal finance management. B
 There are a few pictures on Expenses App.
 
 ## App Video
-<video src="https://github.com/TarcosS/flutter_expense_tracker_app/blob/main/assets/github/video-1.mov"></video>
+https://github.com/TarcosS/flutter_expense_tracker_app/assets/88560100/50ce0523-c8c4-4b5e-b9ab-53dd5fc253b1
 
 ## Home Page - Light Mode
 <img src="https://github.com/TarcosS/flutter_expense_tracker_app/blob/main/assets/github/p1.png" width="300px"/>
