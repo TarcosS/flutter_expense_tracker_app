@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_expense_tracker_app/models/expense.dart';
 
 class ExpenseForm extends StatefulWidget {
-  const ExpenseForm({Key? key}) : super(key: key);
+  const ExpenseForm({Key? key, required this.onSubmit}) : super(key: key);
 
-  // final void Function(String title, double amount, DateTime date, String category) onSubmit;
+  final void Function(Expense expense) onSubmit;
 
   @override
   State<ExpenseForm> createState() => _ExpenseFormState();
@@ -29,24 +29,82 @@ class _ExpenseFormState extends State<ExpenseForm> {
     });
   }
 
+  void _submitExpenseData() {
+    final enteredTitle = _titleController.text;
+    final enteredAmount = double.tryParse(_amountController.text);
+    final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
+
+    if (enteredTitle.trim().isEmpty ||
+        amountIsInvalid ||
+        _selectedDate == null ||
+        _selectedCategory == null) {
+      showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: const Text('Invalid input'),
+            content: const Text(
+                'Please make sure a valid title, amount, date and category was entered.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                },
+                child: const Text('OK!'),
+              )
+            ],
+          );
+        },
+      );
+      return;
+    } else {
+
+      widget.onSubmit(Expense(
+        title: _titleController.text,
+        amount: enteredAmount,
+        date: _selectedDate!,
+        category: _selectedCategory!,
+      ));
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Hey!'),
+            content: const Text('Successfully saved the expense!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: const Text('Expense Saved!'),
+              )
+            ],
+          );
+        },
+      );
+    }
+    // widget.onSubmit(enteredTitle, enteredAmount, _selectedDate!, _selectedCategory);
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
       child: Column(
         children: [
           TextField(
             controller: _titleController,
             maxLength: 50,
             keyboardType: TextInputType.text,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Title',
               hintText: 'Enter the title of the expense',
             ),
@@ -58,7 +116,7 @@ class _ExpenseFormState extends State<ExpenseForm> {
                 child: TextField(
                   autofocus: true,
                   controller: _amountController,
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(signed: true),
                   decoration: const InputDecoration(
                     prefixText: '\$ ',
                     labelText: 'Amount',
@@ -87,35 +145,31 @@ class _ExpenseFormState extends State<ExpenseForm> {
           Row(
             children: [
               DropdownButton(
-                value: _selectedCategory,
-                items: Category.values
-                    .map(
-                      (category) => DropdownMenuItem(
-                        value: category,
-                        child: Text(category.name.toUpperCase()),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  if(value == null) {
-                    return;
-                  }
-                  setState(() {
-                    _selectedCategory = value;
-                  });
-                }
-              ),
+                  value: _selectedCategory,
+                  items: Category.values
+                      .map(
+                        (category) => DropdownMenuItem(
+                          value: category,
+                          child: Text(category.name.toUpperCase()),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value == null) {
+                      return;
+                    }
+                    setState(() {
+                      _selectedCategory = value;
+                    });
+                  }),
               const Spacer(),
               TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Cancel')),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancel')),
               ElevatedButton(
-                onPressed: () {
-                  print(_titleController.text);
-                },
-                child: const Text('Save!'))
+                  onPressed: _submitExpenseData, child: const Text('Save!'))
             ],
           )
         ],
