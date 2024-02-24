@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_expense_tracker_app/widgets/expenses.dart';
 
 void main() {
-  runApp(ExpensesApp(
-      child: ExpensesApp(child: App())
-    ));
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp
+  ]).then((fn) {
+    runApp(ExpensesApp(
+        child: ExpensesApp(child: App())
+      ));
+  });
 }
 
 class App extends StatelessWidget {
